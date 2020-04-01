@@ -7,19 +7,23 @@ let firstOperand = [0]
 let secondOperand = [0]
 let operator = null
 
+
 buttonArray.forEach(button => {
     button.addEventListener('click', e => {
+
+        let OperatorClass = e.target.classList.contains('operator');
+
         if (e.target.innerHTML == "=") {
             operate();
         } else if (e.target.innerHTML == "C") {
             clearScreen();
-        } else if (operator === null && !e.target.classList.contains('operator')) {
+        } else if (operator === null && !OperatorClass) {
             screen.innerHTML += e.target.innerText
             firstOperand.push(e.target.innerText)
         } else if (e.target.classList.contains('operator') && operator === null) {
             screen.innerHTML += e.target.innerText
             operator = e.target.innerText 
-        } else if (operator !== null && !e.target.classList.contains('operator')) {
+        } else if (operator !== null && !OperatorClass) {
             screen.innerHTML += e.target.innerText
             secondOperand.push(e.target.innerText)
         }  
