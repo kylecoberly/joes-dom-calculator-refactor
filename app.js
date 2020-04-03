@@ -1,114 +1,116 @@
-const screen = document.getElementById('screen')
-
-const buttons = document.getElementsByTagName("span");
+const screen = document.querySelector('#screen');
+const buttons = document.querySelectorAll("span");
 const buttonArray = Array.from(buttons);
 
-let firstOperand = [0]
-let secondOperand = [0]
-let operator = null
+let firstOperand = [0];
+let secondOperand = [0];
+let operator = null;
+function getOperator(){
+  return operator
+}
 
+buttonArray.forEach(attachEventListener(getOperator));
+document.addEventListener('keydown', handleKeydown)
 
-buttonArray.forEach(button => {
-    button.addEventListener('click', e => {
+function attachEventListener(getOperator){
+    return button => {
+      button.addEventListener('click', handleButtonPress(getOperator));
+    }
+}
 
-        let OperatorClass = e.target.classList.contains('operator');
+function handleButtonPress(getOperator){
+  return event => {
+    let OperatorClass = event.target.classList.contains('operator');
+    const content = event.target.innerText
 
-        if (e.target.innerHTML == "=") {
-            operate();
-        } else if (e.target.innerHTML == "C") {
-            clearScreen();
-        } else if (operator === null && !OperatorClass) {
-            screen.innerHTML += e.target.innerText
-            firstOperand.push(e.target.innerText)
-        } else if (e.target.classList.contains('operator') && operator === null) {
-            screen.innerHTML += e.target.innerText
-            operator = e.target.innerText 
-        } else if (operator !== null && !OperatorClass) {
-            screen.innerHTML += e.target.innerText
-            secondOperand.push(e.target.innerText)
-        }  
-    })
-});
+    if (content == "=") {
+        operate(getOperator);
+    } else if (content == "C") {
+        clearScreen();
+    } else if (operator === null && !OperatorClass) {
+        screen.innerHTML += content;
+        firstOperand.push(content);
+    } else if (event.target.classList.contains('operator') && operator === null) {
+        screen.innerHTML += content;
+        operator = content;
+    } else if (operator !== null && !OperatorClass) {
+        screen.innerHTML += content;
+        secondOperand.push(content);
+    }  
+  }
+}
 
 function clearScreen() {
-    screen.innerText = ""
-    firstOperand = [0]
-    secondOperand = [0]
-    operator = null
+    screen.innerText = "";
+    firstOperand = [0];
+    secondOperand = [0];
+    operator = null;
 }
 
-function operate() {
+function operate(getOperator) {
     if (!screen.innerText || screen.innerText === "0") {
-        screen.innerText = "0"
+        screen.innerText = "0";
     } else {
-        screen.innerText = checkOperator();
-        firstOperand = screen.innerText.split('')
-        secondOperand = [0]
-        operator = null
+        screen.innerText = checkOperator(getOperator);
+        firstOperand = screen.innerText.split('');
+        secondOperand = [0];
+        operator = null;
     }
 }
 
-function checkOperator() {
+function checkOperator(getOperator) {
     let compute = null;
-    switch (operator) {
-        case "+":
-            compute = add();
-            break; 
-        case "-":
-            compute = subtract();
-            break; 
-        case "x":
-            compute = multiply();
-            break; 
-        case "÷":
-            compute = divide();
+    const operations = {
+      "+": add,
+      "-": subtract,
+      "x": multiply,
+      "÷": divide,
     }
-    return compute 
+    return operations[getOperator()]()
 }
 
 function add() {
-    return (parseInt(firstOperand.join('')) + parseInt(secondOperand.join('')))
+    return +firstOperand.join('') + +secondOperand.join('')
 }
 
 function subtract() {
-    return (parseInt(firstOperand.join('')) - parseInt(secondOperand.join('')))
+    return (parseInt(firstOperand.join('')) - parseInt(secondOperand.join('')));
 }
 
 function multiply() {
-    return (parseInt(firstOperand.join('')) * parseInt(secondOperand.join('')))
+    return (parseInt(firstOperand.join('')) * parseInt(secondOperand.join('')));
 }
 
 function divide() {
-    return (parseInt(firstOperand.join('')) / parseInt(secondOperand.join('')))
+    return (parseInt(firstOperand.join('')) / parseInt(secondOperand.join('')));
 }
 
-// user can use keyboad
 
-document.addEventListener('keydown', e=> {
-    console.log(e)
-
-    if (e.keyCode == 13) {
-        operate();
-    } else if (e.keyCode == 27) {
+function handleKeydown(someExternalThing){
+  return function(event){
+    if (event.keyCode == 13) {
+        operate(operator);
+    } else if (event.keyCode == 27) {
         clearScreen();
-    } else if (e.keyCode > 47 && e.keyCode < 58 && !e.shiftKey && operator === null) {
-        screen.innerHTML += e.key
-        firstOperand.push(e.key)
-    } else if (e.keyCode == 189 && operator === null) {
-        screen.innerHTML += e.key
-        operator = "-" 
-    } else if (e.keyCode == 187 && operator === null) {
-        screen.innerHTML += e.key
-        operator = "+" 
-    } else if ((e.keyCode == 56 || e.keyCode == 88) && operator === null) {
-        screen.innerHTML += "x"
-        operator = "x" 
-    } else if ((e.keyCode == 53 || e.keyCode == 191) && operator === null) {
-        screen.innerHTML += "÷"
-        operator = "÷" 
+    } else if (event.keyCode > 47 && event.keyCode < 58 && !event.shiftKey && operator === null) {
+        screen.innerHTML += event.key;
+        firstOperand.push(event.key);
+    } else if (event.keyCode == 189 && operator === null) {
+        screen.innerHTML += event.key;
+        operator = "-";
+    } else if (event.keyCode == 187 && operator === null) {
+        screen.innerHTML += event.key;
+        operator = "+";
+    } else if ((event.keyCode == 56 || event.keyCode == 88) && operator === null) {
+        screen.innerHTML += "x";
+        operator = "x";
+    } else if ((event.keyCode == 53 || event.keyCode == 191) && operator === null) {
+        screen.innerHTML += "÷";
+        operator = "÷";
     } 
-    else if (e.keyCode > 47 && e.keyCode < 58 && !e.shiftKey && operator !== null) {
-        screen.innerHTML += e.key
-        secondOperand.push(e.key)
+    else if (event.keyCode > 47 && event.keyCode < 58 && !event.shiftKey && operator !== null) {
+        screen.innerHTML += event.key;
+        secondOperand.push(event.key);
     }  
-})
+  }
+}
